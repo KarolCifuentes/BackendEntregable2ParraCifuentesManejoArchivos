@@ -62,11 +62,25 @@ import {promises as fs} from "fs"
         }
      }
 
+
      deleteProductById = async (id) => {
         let respuesta3 = await this.readProduct()
-        let productFilter = respuesta3.filter(product => products.id != id)
+        let productFilter = respuesta3.filter(product => product.id != id)
 
-        console.log(productFilter)
+        await fs.writeFile(this.patch, JSON.stringify(productFilter))
+        console.log("El producto "+id+" se elimino")
+     }
+
+
+     updateProduct = async ({id, ...product}) => {
+        await this.deleteProductById(id)
+
+        let productOld = await this.readProduct()
+        //console.log(productOld)
+
+        let productModified = [{id, ...product}, ...productOld];
+        //console.log(productModified)
+        await fs.writeFile(this.patch, JSON.stringify(productModified))
 
      }
  }
@@ -74,10 +88,20 @@ import {promises as fs} from "fs"
  const product = new ProductManager
 
  /*product.addProduct("title1", "description1", 500, "thumbnail1", "0001", 2)
- product.addProduct("title2", "description2", 1000, "thumbnail1", "00022", 1)*/
+ product.addProduct("title2", "description2", 1000, "thumbnail1", "0002", 1)*/
 
  //product.getProduct()
 
  //product.getProductById(2)
 
- product.deleteProductById(2)
+ //product.deleteProductById(2)
+
+ product.updateProduct({
+     title: 'title1',
+     description: 'description1',
+     price: 800,
+     thumbnail: 'thumbnail1',
+     code: '0001',
+     stock: 44,
+     id: 1
+ })
